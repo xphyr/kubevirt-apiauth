@@ -211,11 +211,10 @@ In this demo we use a built in RBAC role called "view", which allows the user/ac
 
 This can be done by creating a custom RBAC Role as described in the KubeVirt documentation [Creating Customer RBAC Roles](https://kubevirt.io/user-guide/operations/authorization/#creating-custom-rbac-roles)
 
-
 ## References
 
 [KubeVirt Client Go](https://github.com/kubevirt/client-go)
-[KubeVirt API Access Control](https://kubevirt.io/2018/KubeVirt-API-Access-Control.html)
-[KubeVirt Default RBAC Cluster Roles](https://kubevirt.io/user-guide/operations/authorization/)
 
-No service account key rotation process: https://github.com/kubernetes/kubernetes/issues/20165
+[KubeVirt API Access Control](https://kubevirt.io/2018/KubeVirt-API-Access-Control.html)
+
+[KubeVirt Default RBAC Cluster Roles](https://kubevirt.io/user-guide/operations/authorization/)
