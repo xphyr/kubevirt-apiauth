@@ -50,7 +50,7 @@ The default authentication file for Kubernetes is the [kubeconfig](https://kuber
 
 ### Using the default kubeconfig
 
-If you haven't already done so, log into your OpenShift cluster with the oc command:
+If you haven't already done so, log into your OpenShift cluster with the "_oc_" command:
 
 ```shell
 $ oc login https://api.<clustername>.<basedomain> -u <userName>
@@ -111,11 +111,11 @@ namespace:       5 bytes
 service-ca.crt:  8443 bytes
 ```
 
-The data listed for the "token" key is the information we will use in the next step.
+The data listed for the "token" key is the information we will use in the next step, your output will be much longer, it has been truncated for this document. Ensure when copying the value that you get the entire token value.
 
 ### Creating a kubeconfig for the service account
 
-We will create a new kubeconfig file that leverages the service account and token we just created. The easiest way to do this is to create an empty kubeconfig file, and use the oc command to log in with the new token. We will start by setting the KUBECONFIG environment variable to point to a file in our local directory, and then using the oc command log into the cluster:
+We will create a new kubeconfig file that leverages the service account and token we just created. The easiest way to do this is to create an empty kubeconfig file, and use the "_oc_" command to log in with the new token. We will start by setting the KUBECONFIG environment variable to point to a file in our local directory, and then using the "_oc_" command log into the cluster:
 
 ```shell
 $ export KUBECONFIG=$(pwd)/sa-kubeconfig
@@ -135,6 +135,7 @@ You can see we are now using our service account, but that service account doesn
 
 ```shell
 $ oc policy add-role-to-user kubevirt.io:view system:serviceaccount:myvms:mykubevirtrunner
+clusterrole.rbac.authorization.k8s.io/kubevirt.io:view added: "system:serviceaccount:myvms:mykubevirtrunner"
 ```
 
 Now run the listvms command again:
@@ -151,9 +152,9 @@ Success! Our application is now using the service account that we created for au
 
 So all of this is great if you want to run the application outside of your cluster ... but what if you want your application to run INSIDE you cluster. You could create a kubeconfig file, and add it to your namespace as a secret and then mount that secret as a volume inside your pod, but there is an easier way that continues to leverage the service account that we created. By default kubernetes creates a few environment variables for every pod that indicate that the container is running within kubernetes, and it makes a kubernetes auth token for the service account that the container is running as available at /var/run/secrets/kubernetes.io/serviceaccount/token.  The client-go KubeVirt library can detect that it is running inside a kubernetes hosted container and will transparently use the auth token provided with no additional configuration needed.
 
-A container image with the listvms binary is available at quay.io/markd/listvms. We can start a copy of this container using the deployment yaml file located in the 'listvms/listvms_deployment.yaml' file.
+A container image with the listvms binary is available at **quay.io/markd/listvms**. We can start a copy of this container using the deployment yaml file located in the 'listvms/listvms_deployment.yaml' file.
 
-Using the oc command deploy one instance of the pod, and then check the logs of the pod:
+Using the "_oc_" command deploy one instance of the pod, and then check the logs of the pod:
 
 ```shell
 $ oc create -f listvms/listvms_deployment.yaml
@@ -165,9 +166,11 @@ $ oc logs listvms-7b8f865c8d-2zqqn
 2021/06/23 18:12:04 cannot obtain KubeVirt vm list: virtualmachines.kubevirt.io is forbidden: User "system:serviceaccount:myvms:default" cannot list resource "virtualmachines" in API group "kubevirt.io" in the namespace "myvms"`
 ```
 
+> **NOTE:** Be sure to deploy this demo application in a namespace that contains at least one running VM or VMI.
+
 The application is unable to run the operation, because it is running as the default service account in the "_myvms_" namespace. If you remember previously we created a service account in this namespace called "mykubevirtrunner". We need only update the deployment to use this service account and we should see some success. Use the "oc edit" command to update the container spec to include the "serviceAccount: mykubevirtrunner" line as show below:
 
-```shell
+```yaml
     spec:
       containers:
         - name: listvms
