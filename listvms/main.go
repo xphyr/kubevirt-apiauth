@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"text/tabwriter"
 
@@ -43,7 +44,8 @@ func main() {
 	if flagNamespaceString != "" {
 		// we have additional namespaces to check
 		fmt.Println("additional namespaces to check are: ", flagNamespaceString)
-		namespaces = append(namespaces, flagNamespaceString)
+		s := strings.Split(flagNamespaceString, ",")
+		namespaces = append(namespaces, s...)
 	}
 
 	fmt.Println("Checking the following namespaces: ", namespaces)
@@ -76,8 +78,8 @@ func main() {
 		for _, vmi := range vmiList.Items {
 			fmt.Fprintf(w, "%s\t%s\t%s\t%v\n", vmi.Kind, vmi.Name, vmi.Namespace, vmi.Status.Phase)
 		}
-		w.Flush()
 	}
+	w.Flush()
 
 	// this is a hack to allow the program to just run doing nothing until signaled to quit
 	// this is used as an example to show what would happen if the application is run inside a k8s cluster
